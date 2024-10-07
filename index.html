@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MAPs</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/> <!--maps library-->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>     <!--maps library-->   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/player/player.min.css">   <!--papaparse library-->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>       <!--papaparse library css-->
+    <script src="Leaflet.heat-gh-pages\Leaflet.heat-gh-pages\dist\leaflet-heat.js"></script> <!--Heatmap-->
+</head>
+
+<body>
+    <h1>MAPs</h1>
+    <p>This is my map</p>
+    <div id="map" style="width: 600px; height: 500px; position: relative;" class="leaflet-container leaflet-touch leaflet-retina leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0">
+    </div>
+
+    <!--papaparse upload file -->
+    <input type="file" id="uploadfile" accept=".csv">
+    <button id="uploadconfirm">Upload File</button>
+
+    <script>
+        const map = L.map('map').setView([48.527297, -123.401135], 10);
+
+        const latitudedata = [];
+        const longitudedata = [];
+        const powerdata = [];
+
+        const uploadconfirm = document.getElementById('uploadconfirm').addEventListener('click', () => {
+            Papa.parse(document.getElementById('uploadfile').files[0],
+            {
+                dowload: true,
+                header: true,
+                skipEmptyLine: true,
+                complete: function(results) {
+                    console.log(results);
+                    console.log(results.data[0]);
+                    console.log(results.data[0].Latitude);
+                    console.log(results.data[0].Longitude);
+                    console.log(results.data[0].Power);
+                    for (i =0; i < results.data.length ; i++){
+                        latitudedata.push(results.data[i].Latitude);
+                        longitudedata.push(results.data[i].Longitude);
+                        powerdata.push(results.data[i].Power);
+                    }
+                    console.log(latitudedata);
+                    console.log(longitudedata);
+                    console.log(powerdata);
+
+                    for (i =0; i < latitudedata.length ; i++){
+                        var marker = L.marker([latitudedata[i], longitudedata[i]]).addTo(map).bindPopup(powerdata[i]).openPopup();
+                        if (powerdata[i] >= -102){
+                            var circle = L.circle([latitudedata[i], longitudedata[i]], {
+                                    color: 'red',
+                                    fillColor: '#f03',
+                                    fillOpacity: 0.5,
+                                    radius: 200
+                            
+                            }).addTo(map);
+                        }
+                        else if (powerdata[i] >= -108){
+                            var circle = L.circle([latitudedata[i], longitudedata[i]], {
+                                    color: 'yellow',
+                                    fillColor: '#FFFF00',
+                                    fillOpacity: 0.5,
+                                    radius: 200
+                            
+                            }).addTo(map);
+                        }
+                        else {
+                            var circle = L.circle([latitudedata[i], longitudedata[i]], {
+                                    color: 'green',
+                                    fillColor: '#00FF00',
+                                    fillOpacity: 0.5,
+                                    radius: 200
+                            
+                            }).addTo(map);
+                        }
+                    }
+                }
+            });
+        });
+
+        //<!--papaparse-->
+
+        //<!--Maps-->
+
+        
+        var marker = L.marker([48.527297, -123.401135]).addTo(map);
+        var point = L.point(48.527297, -123.401135);
+        //marker.title('This is it...');
+
+        var circle = L.circle([48.697598, -123.446800], {
+                        color: 'red',
+                        fillColor: '#f03',
+                        fillOpacity: 0.5,
+                        radius: 200
+                    }).addTo(map);
+                    
+        var circle2 = L.circle([48.661220, -123.401397], {
+                        color: 'blue',
+                        fillColor: '#0000ff',
+                        fillOpacity: 0.5,
+                        radius: 250
+                    }).addTo(map);
+
+        const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 20,
+                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    }).addTo(map);
+
+
+    </script>
+
+
+</body>
+</html>
